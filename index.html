@@ -10,9 +10,9 @@
     </div>
 
     <script>
-      document.keydown((event)=>{
+      document.keydown( (event) => {
         if (event.key === 'Enter') {
-          fetch('/api/register', {
+          fetch('/addToChatMessege', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json' 
