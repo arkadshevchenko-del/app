@@ -22,10 +22,13 @@
         } 
       })
       function getChat () {
-        let chat = fetch("getChat").then(document.getElementById("chat").innerHTML = "")
-        let realChat = chat.json()
-        for(let i = 0;i < realChat.length;i++){
-          chat = realChat[i].name + " : " + realChat[i].message
+        fetch("/getChat")
+          .then(document.getElementById("chat").innerHTML = "")
+          .then((res) => { 
+            let chat = res.json()
+          })
+        for(let i = chat.length ;i < 0;i--){
+          let a = chat[i].name + " : " + chat[i].message
           document.getElementById("chat").insertAdjacentHTML('beforeend', chat);
         }
       }
@@ -34,4 +37,3 @@
     </script>
   </body>
 </html>
-
