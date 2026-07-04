@@ -11,6 +11,7 @@ app.get("/getChat",(req,res) => {
   res.json(chat)
 })
 app.post("/addToChatMessege",(req,res)=>{
+  
   chat.push({name:req.body.name,message:req.body.message})
   res.json()
 })
