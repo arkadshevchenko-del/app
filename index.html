@@ -21,10 +21,10 @@
     <script>
       let n = localStorage.getItem("name")
       let inp = localStorage.getItem("input")
-      if (n !== undefined) {
+      if (n !== null) {
         document.getElementById("name").value = n
       }
-      if (inp !== undefined) {
+      if (inp !== null) {
         document.getElementById("input").value = inp
       }
       function sendM () {
@@ -33,7 +33,10 @@
             headers: {
                 'Content-Type': 'application/json' 
             },
-            body: JSON.stringify({name : document.getElementById("name").value, message : document.getElementById("input").value}) 
+            body: JSON.stringify({
+              sender: document.getElementById("name").value, 
+              text: document.getElementById("input").value  
+          })
           })
       }
       document.addEventListener( "keydown",(event) => {
