@@ -21,19 +21,23 @@
           })
         } 
       })
-      function getChat () {
+      
+      function getChat() {
         fetch("/getChat")
-          .then(document.getElementById("chat").innerHTML = "")
-          .then((res) => { 
-            let chat = res.json()
+          .then((res) => res.json()) 
+          .then((chatData) => {
+            const chatDiv = document.getElementById("chat");
+            chatDiv.innerHTML = ""; 
+
+            
+            for (let i = chatData.length - 1; i >= 0; i--) {
+              let messageLine = `<p><strong>${chatData[i].name}:</strong> ${chatData[i].message}</p>`;
+              chatDiv.insertAdjacentHTML('beforeend', messageLine);
+            }
           })
-          if (chat.length !== 0 ){
-        for(let i = chat.length ;i < 0;i--){
-          let a = chat[i].name + " : " + chat[i].message
-          document.getElementById("chat").insertAdjacentHTML('beforeend', chat);
-        }
+          .catch(err => console.error("Помилка завантаження чату:", err));
       }
-    }
+
       getChat()
       let interval = setInterval(getChat,1000)
     </script>
