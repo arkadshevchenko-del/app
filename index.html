@@ -27,11 +27,13 @@
           .then((res) => { 
             let chat = res.json()
           })
+          if (chat.length !== 0 ){
         for(let i = chat.length ;i < 0;i--){
           let a = chat[i].name + " : " + chat[i].message
           document.getElementById("chat").insertAdjacentHTML('beforeend', chat);
         }
       }
+    }
       getChat()
       let interval = setInterval(getChat,1000)
     </script>
