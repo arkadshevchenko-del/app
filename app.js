@@ -1,62 +1,56 @@
-<html>
-  <head>
-    <title>salam</title>
-    <style>
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-        font-family: 'Segoe UI', sans-serif;
-      }
-    </style>
-  </head>
-  <body>
-    <input type="text" id="name" placeholder="Введіть імя">
-    <input type="text" id="input" placeholder="Введіть повідомлення">
-    <input type="button" onclick = "sendM()" value="Надіслати" id="send">
-    <div id="chat">
-      <h1>загрузка чата...</h1>
-    </div>
+const express = require("express");
+const path = require('path');
+const mongoose = require('mongoose');
 
-    <script>
-      let h = localStorage.getItem("h")
-      if (h !== undefined) {
-        document.getElementById("send").value = h
-      }
-      function sendM () {
-        fetch('/addToChatMessege', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json' 
-            },
-            body: JSON.stringify({name : document.getElementById("name").value, message : document.getElementById("input").value}) 
-          })
-      }
-      document.addEventListener( "keydown",(event) => {
-        if (event.key === 'Enter') {
-          sendM()
-        } 
-        localStorage.setItem("h",document.getElementById("send").value)
-      })
-      
-      function getChat() {
-        fetch("/getChat")
-          .then((res) => res.json()) 
-          .then((chatData) => {
-            const chatDiv = document.getElementById("chat");
-            chatDiv.innerHTML = ""; 
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-            
-            for (let i = chatData.length - 1; i >= 0; i--) {
-              let messageLine = `<p><strong>${chatData[i].name}:</strong> ${chatData[i].message}</p>`;
-              chatDiv.insertAdjacentHTML('beforeend', messageLine);
-            }
-          })
-          .catch(err => console.error("Помилка завантаження чату:", err));
-      }
+// 1. Твій рядок підключення до MongoDB Atlas
+const mongoURI = "mongodb://Zlata:Gevko@ac-gbm2ajb-shard-00-00.romuaxa.mongodb.net:27017,ac-gbm2ajb-shard-00-01.romuaxa.mongodb.net:27017,ac-gbm2ajb-shard-00-02.romuaxa.mongodb.net:27017/?ssl=true&replicaSet=atlas-11g6h3-shard-0&authSource=admin&appName=Cluster0";
 
-      getChat()
-      let interval = setInterval(getChat,1000)
-    </script>
-  </body>
-</html>
+// Підключаємося до бази (додаємо назву бази, наприклад 'chatDB', перед знаком питання)
+mongoose.connect(mongoURI + "&dbName=chatDB")
+  .then(() => console.log("Підключено до MongoDB Atlas!"))
+  .catch(err => console.error("Помилка підключення:", err));
+
+// 2. Створюємо просту схему без дат
+const messageSchema = new mongoose.Schema({
+  name: { type: String, default: "Анонім" },
+  message: { type: String, required: true }
+}, { versionKey: false }); // versionKey: false прибирає поле __v, яке mongoose додає автоматично
+
+const Message = mongoose.model('Message', messageSchema);
+
+// Middleware для читання JSON від фронтенду
+app.use(express.json());
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
+
+// 3. Отримання чату з бази даних
+app.get("/getChat", async (req, res) => {
+  try {
+    const chat = await Message.find();
+    res.json(chat);
+  } catch (error) {
+    res.status(500).json({ error: "Не вдалося отримати повідомлення" });
+  }
+});
+
+// 4. Запис нового повідомлення в базу
+app.post("/addToChatMessege", async (req, res) => {
+  try {
+    const newMessage = new Message({
+      name: req.body.name,
+      message: req.body.message
+    });
+
+    await newMessage.save();
+    res.sendStatus(201); // Статус "Успішно створено"
+  } catch (error) {
+    res.status(400).json({ error: "Помилка при збереженні" });
+  }
+});
+
+app.listen(PORT, () => console.log(`Сервер запущено на порті ${PORT}`));
