@@ -11,7 +11,7 @@ app.get("/getChat",(req,res) => {
   res.json(chat)
 })
 app.post("/addToChatMessege",(req,res)=>{
-  chat[chat.length + 1].name = req.body.name
-  chat[chat.length + 1].message = req.body.message
+  chat.push({name:req.body.name,message:req.body.message})
+  res.json()
 })
 app.listen(PORT)
