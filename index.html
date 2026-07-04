@@ -10,7 +10,7 @@
     </div>
 
     <script>
-      document.keydown( (event) => {
+      document.addEventListener( keydown,(event) => {
         if (event.key === 'Enter') {
           fetch('/addToChatMessege', {
             method: 'POST',
@@ -34,3 +34,4 @@
     </script>
   </body>
 </html>
+
